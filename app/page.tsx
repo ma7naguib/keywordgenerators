@@ -1,12 +1,16 @@
+import Link from 'next/link';
+
 export default function Home() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
       {/* Header */}
       <header className="bg-white shadow-sm">
         <div className="max-w-7xl mx-auto px-4 py-6">
-          <h1 className="text-3xl font-bold text-indigo-600">
-            KeywordGenerators
-          </h1>
+          <Link href="/">
+            <h1 className="text-3xl font-bold text-indigo-600 cursor-pointer">
+              KeywordGenerators
+            </h1>
+          </Link>
         </div>
       </header>
 
@@ -22,9 +26,11 @@ export default function Home() {
           </p>
           
           {/* CTA Button */}
-          <button className="bg-indigo-600 text-white px-8 py-4 rounded-lg text-lg font-semibold hover:bg-indigo-700 transition">
-            Start Free Trial
-          </button>
+          <Link href="/generate">
+            <button className="bg-indigo-600 text-white px-8 py-4 rounded-lg text-lg font-semibold hover:bg-indigo-700 transition">
+              Start Free Trial
+            </button>
+          </Link>
           
           <p className="text-sm text-gray-500 mt-4">
             No credit card required • 5 free searches daily
@@ -118,9 +124,11 @@ export default function Home() {
                   No difficulty analysis
                 </li>
               </ul>
-              <button className="w-full bg-gray-100 text-gray-800 py-3 rounded-lg font-semibold hover:bg-gray-200 transition">
-                Get Started Free
-              </button>
+              <Link href="/generate">
+                <button className="w-full bg-gray-100 text-gray-800 py-3 rounded-lg font-semibold hover:bg-gray-200 transition">
+                  Get Started Free
+                </button>
+              </Link>
             </div>
 
             {/* Pro Plan */}
@@ -154,9 +162,11 @@ export default function Home() {
                   Priority support
                 </li>
               </ul>
-              <button className="w-full bg-indigo-600 text-white py-3 rounded-lg font-semibold hover:bg-indigo-700 transition">
-                Start Free Trial
-              </button>
+              <Link href="/generate">
+                <button className="w-full bg-indigo-600 text-white py-3 rounded-lg font-semibold hover:bg-indigo-700 transition">
+                  Start Free Trial
+                </button>
+              </Link>
             </div>
           </div>
         </div>
