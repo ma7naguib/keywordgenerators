@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import {
@@ -28,7 +28,7 @@ interface GroupedKeywords {
   informational: KeywordResult[];
 }
 
-export default function GeneratePage() {
+function GeneratePageContent() {
   const searchParams = useSearchParams();
   const [topic, setTopic] = useState('');
   const [keywords, setKeywords] = useState<KeywordResult[]>([]);
@@ -465,5 +465,20 @@ export default function GeneratePage() {
         </div>
       </main>
     </div>
+  );
+}
+
+export default function GeneratePage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-indigo-600 mx-auto mb-4"></div>
+          <p className="text-gray-600 text-lg font-semibold">Loading...</p>
+        </div>
+      </div>
+    }>
+      <GeneratePageContent />
+    </Suspense>
   );
 }
