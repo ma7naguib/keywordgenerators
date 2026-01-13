@@ -41,34 +41,35 @@ export default function OnboardingPage() {
   const [goal, setGoal] = useState<Goal | null>(null);
   const [strategy, setStrategy] = useState<Strategy | null>(null);
 
-  const handleNext = () => {
-    if (step < 3) {
-      setStep(step + 1);
-    } else {
-      // Save preferences and go to generate page
+  const handlePlatformSelect = (value: Platform) => {
+    setPlatform(value);
+    setTimeout(() => setStep(2), 300);
+  };
+
+  const handleGoalSelect = (value: Goal) => {
+    setGoal(value);
+    setTimeout(() => setStep(3), 300);
+  };
+
+  const handleStrategySelect = (value: Strategy) => {
+    setStrategy(value);
+    setTimeout(() => {
       const params = new URLSearchParams({
         platform: platform!,
         goal: goal!,
-        strategy: strategy!,
+        strategy: value,
       });
       router.push(`/generate?${params.toString()}`);
-    }
-  };
-
-  const canProceed = () => {
-    if (step === 1) return platform !== null;
-    if (step === 2) return goal !== null;
-    if (step === 3) return strategy !== null;
-    return false;
+    }, 300);
   };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
       {/* Header */}
       <header className="bg-white shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 py-6">
+        <div className="max-w-7xl mx-auto px-4 py-4 sm:py-6">
           <Link href="/">
-            <h1 className="text-3xl font-bold text-indigo-600 cursor-pointer">
+            <h1 className="text-2xl sm:text-3xl font-bold text-indigo-600 cursor-pointer">
               KeywordGenerators
             </h1>
           </Link>
@@ -76,10 +77,10 @@ export default function OnboardingPage() {
       </header>
 
       {/* Main Content */}
-      <main className="max-w-4xl mx-auto px-4 py-12">
-        <div className="bg-white rounded-2xl shadow-xl p-8">
+      <main className="max-w-4xl mx-auto px-4 py-8 sm:py-12">
+        <div className="bg-white rounded-2xl shadow-xl p-6 sm:p-8">
           {/* Progress Bar */}
-          <div className="mb-8">
+          <div className="mb-6 sm:mb-8">
             <div className="flex justify-between items-center mb-2">
               <span className="text-sm font-semibold text-gray-600">
                 Step {step} of 3
@@ -100,33 +101,33 @@ export default function OnboardingPage() {
           {step === 1 && (
             <div className="space-y-6">
               <div>
-                <h2 className="text-3xl font-bold mb-2">
+                <h2 className="text-2xl sm:text-3xl font-bold mb-2">
                   Where do you want to get traffic?
                 </h2>
-                <p className="text-gray-600">
+                <p className="text-sm sm:text-base text-gray-600">
                   Choose your primary platform to optimize keywords accordingly
                 </p>
               </div>
 
-              <div className="grid md:grid-cols-2 gap-4">
+              <div className="grid sm:grid-cols-2 gap-3 sm:gap-4">
                 {platformOptions.map((option) => (
                   <button
                     key={option.value}
-                    onClick={() => setPlatform(option.value as Platform)}
-                    className={`p-6 rounded-xl border-2 text-left transition ${
+                    onClick={() => handlePlatformSelect(option.value as Platform)}
+                    className={`p-4 sm:p-6 rounded-xl border-2 text-left transition ${
                       platform === option.value
                         ? 'border-indigo-600 bg-indigo-50'
                         : 'border-gray-200 hover:border-indigo-300'
                     }`}
                   >
-                    <div className="flex items-start gap-4">
-                      <span className="text-3xl">{option.icon}</span>
+                    <div className="flex items-start gap-3 sm:gap-4">
+                      <span className="text-2xl sm:text-3xl">{option.icon}</span>
                       <div className="flex-1">
-                        <h3 className="font-bold text-lg mb-1">{option.label}</h3>
-                        <p className="text-sm text-gray-600">{option.desc}</p>
+                        <h3 className="font-bold text-base sm:text-lg mb-1">{option.label}</h3>
+                        <p className="text-xs sm:text-sm text-gray-600">{option.desc}</p>
                       </div>
                       {platform === option.value && (
-                        <span className="text-indigo-600 text-xl">✓</span>
+                        <span className="text-indigo-600 text-lg sm:text-xl">✓</span>
                       )}
                     </div>
                   </button>
@@ -139,33 +140,33 @@ export default function OnboardingPage() {
           {step === 2 && (
             <div className="space-y-6">
               <div>
-                <h2 className="text-3xl font-bold mb-2">
+                <h2 className="text-2xl sm:text-3xl font-bold mb-2">
                   How will you make money?
                 </h2>
-                <p className="text-gray-600">
+                <p className="text-sm sm:text-base text-gray-600">
                   This helps us find keywords with the right intent
                 </p>
               </div>
 
-              <div className="grid md:grid-cols-2 gap-4">
+              <div className="grid sm:grid-cols-2 gap-3 sm:gap-4">
                 {goalOptions.map((option) => (
                   <button
                     key={option.value}
-                    onClick={() => setGoal(option.value as Goal)}
-                    className={`p-6 rounded-xl border-2 text-left transition ${
+                    onClick={() => handleGoalSelect(option.value as Goal)}
+                    className={`p-4 sm:p-6 rounded-xl border-2 text-left transition ${
                       goal === option.value
                         ? 'border-indigo-600 bg-indigo-50'
                         : 'border-gray-200 hover:border-indigo-300'
                     }`}
                   >
-                    <div className="flex items-start gap-4">
-                      <span className="text-3xl">{option.icon}</span>
+                    <div className="flex items-start gap-3 sm:gap-4">
+                      <span className="text-2xl sm:text-3xl">{option.icon}</span>
                       <div className="flex-1">
-                        <h3 className="font-bold text-lg mb-1">{option.label}</h3>
-                        <p className="text-sm text-gray-600">{option.desc}</p>
+                        <h3 className="font-bold text-base sm:text-lg mb-1">{option.label}</h3>
+                        <p className="text-xs sm:text-sm text-gray-600">{option.desc}</p>
                       </div>
                       {goal === option.value && (
-                        <span className="text-indigo-600 text-xl">✓</span>
+                        <span className="text-indigo-600 text-lg sm:text-xl">✓</span>
                       )}
                     </div>
                   </button>
@@ -178,33 +179,33 @@ export default function OnboardingPage() {
           {step === 3 && (
             <div className="space-y-6">
               <div>
-                <h2 className="text-3xl font-bold mb-2">
+                <h2 className="text-2xl sm:text-3xl font-bold mb-2">
                   What's your keyword strategy?
                 </h2>
-                <p className="text-gray-600">
+                <p className="text-sm sm:text-base text-gray-600">
                   Choose based on your competition tolerance
                 </p>
               </div>
 
-              <div className="grid md:grid-cols-2 gap-4">
+              <div className="grid sm:grid-cols-2 gap-3 sm:gap-4">
                 {strategyOptions.map((option) => (
                   <button
                     key={option.value}
-                    onClick={() => setStrategy(option.value as Strategy)}
-                    className={`p-6 rounded-xl border-2 text-left transition ${
+                    onClick={() => handleStrategySelect(option.value as Strategy)}
+                    className={`p-4 sm:p-6 rounded-xl border-2 text-left transition ${
                       strategy === option.value
                         ? 'border-indigo-600 bg-indigo-50'
                         : 'border-gray-200 hover:border-indigo-300'
                     }`}
                   >
-                    <div className="flex items-start gap-4">
-                      <span className="text-3xl">{option.icon}</span>
+                    <div className="flex items-start gap-3 sm:gap-4">
+                      <span className="text-2xl sm:text-3xl">{option.icon}</span>
                       <div className="flex-1">
-                        <h3 className="font-bold text-lg mb-1">{option.label}</h3>
-                        <p className="text-sm text-gray-600">{option.desc}</p>
+                        <h3 className="font-bold text-base sm:text-lg mb-1">{option.label}</h3>
+                        <p className="text-xs sm:text-sm text-gray-600">{option.desc}</p>
                       </div>
                       {strategy === option.value && (
-                        <span className="text-indigo-600 text-xl">✓</span>
+                        <span className="text-indigo-600 text-lg sm:text-xl">✓</span>
                       )}
                     </div>
                   </button>
@@ -214,27 +215,23 @@ export default function OnboardingPage() {
           )}
 
           {/* Navigation Buttons */}
-          <div className="flex justify-between items-center mt-8 pt-6 border-t">
+          <div className="flex justify-between items-center mt-6 sm:mt-8 pt-4 sm:pt-6 border-t">
             {step > 1 ? (
               <button
                 onClick={() => setStep(step - 1)}
-                className="px-6 py-3 text-gray-600 hover:text-gray-900 font-semibold"
+                className="px-4 sm:px-6 py-2 sm:py-3 text-gray-600 hover:text-gray-900 font-semibold text-sm sm:text-base"
               >
                 ← Back
               </button>
             ) : (
-              <Link href="/" className="px-6 py-3 text-gray-600 hover:text-gray-900 font-semibold">
+              <Link href="/" className="px-4 sm:px-6 py-2 sm:py-3 text-gray-600 hover:text-gray-900 font-semibold text-sm sm:text-base">
                 ← Home
               </Link>
             )}
 
-            <button
-              onClick={handleNext}
-              disabled={!canProceed()}
-              className="px-8 py-3 bg-indigo-600 text-white rounded-lg font-semibold hover:bg-indigo-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition"
-            >
-              {step === 3 ? 'Generate Keywords →' : 'Next →'}
-            </button>
+            <span className="text-xs sm:text-sm text-gray-500">
+              Select an option to continue
+            </span>
           </div>
         </div>
       </main>
