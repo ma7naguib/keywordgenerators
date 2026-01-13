@@ -1,14 +1,37 @@
 import Groq from 'groq-sdk';
 import { NextRequest, NextResponse } from 'next/server';
+import { currentUser } from '@clerk/nextjs/server';
+import { checkUsageLimit, incrementUsage } from '../../../lib/usage';
+import { generatePrompt } from '../../../lib/prompt-templates';
+import { calculateBusinessFit, KeywordWithFit } from '../../../lib/business-fit';
+import { Platform, Goal, Strategy, UserLevel, detectUserLevel } from '../../../lib/user-profile';
 
 const groq = new Groq({
-  apiKey: process.env.GROQ_API_KEY,
+  apiKey: process.env.GROQ_API_KEY || 'dummy-key-for-build',
 });
 
 export async function POST(req: NextRequest) {
   try {
-    const { topic } = await req.json();
+    const user = await currentUser();
+    
+    // Check usage limit
+    const usage = await checkUsageLimit();
+    
+    if (!usage.allowed) {
+      return NextResponse.json(
+        { 
+          error: 'Daily limit reached!',
+          limitReached: true,
+          upgradeUrl: '/pricing'
+        },
+        { status: 429 }
+      );
+    }
 
+    const body = await req.json();
+    const { topic, platform, goal, strategy } = body;
+
+    // Validation
     if (!topic || typeof topic !== 'string') {
       return NextResponse.json(
         { error: 'Topic is required' },
@@ -16,37 +39,59 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    if (!platform || !goal || !strategy) {
+      return NextResponse.json(
+        { error: 'Please complete the onboarding questions' },
+        { status: 400 }
+      );
+    }
+
+    // Detect user level
+    const userLevel: UserLevel = detectUserLevel(
+      platform as Platform,
+      goal as Goal,
+      strategy as Strategy
+    );
+
+    // Increment usage if user is logged in
+    if (user) {
+      await incrementUsage();
+    }
+
+    // Determine keyword limit based on plan
+    const keywordLimit = usage.isPro ? 50 : 30;
+
+    // Generate personalized prompt
+    const prompt = generatePrompt(
+      topic,
+      platform as Platform,
+      goal as Goal,
+      strategy as Strategy,
+      userLevel,
+      keywordLimit
+    );
+
+    // Call AI
     const completion = await groq.chat.completions.create({
       messages: [
         {
           role: 'system',
-          content: 'You are a keyword research expert. Generate relevant long-tail keywords for SEO and content marketing.',
+          content: 'You are an expert keyword strategist. Generate high-quality, actionable keywords based on the user profile.',
         },
         {
           role: 'user',
-          content: `Generate 30 keyword ideas for: "${topic}"
-
-Requirements:
-- Long-tail keywords (3-6 words)
-- Include question-based keywords (how to, what is, etc.)
-- Include buying intent keywords (best, top, review, etc.)
-- Return ONLY keywords, one per line
-- No numbering, no explanations, no extra text
-
-Example format:
-best yoga mats for beginners
-how to start yoga at home
-yoga poses for back pain`,
+          content: prompt,
         },
       ],
       model: 'llama-3.3-70b-versatile',
       temperature: 0.7,
-      max_tokens: 600,
+      max_tokens: 800,
     });
 
     const text = completion.choices[0]?.message?.content || '';
 
-    const keywords = text
+    // Parse keywords
+    const rawKeywords = text
       .split('\n')
       .map((line: string) => line.replace(/^\d+[\.\)]\s*/, '').trim())
       .filter((line: string) => {
@@ -58,15 +103,46 @@ yoga poses for back pain`,
           !line.toLowerCase().includes('keyword')
         );
       })
-      .slice(0, 30);
+      .slice(0, keywordLimit);
 
-    if (keywords.length === 0) {
+    if (rawKeywords.length === 0) {
       throw new Error('No keywords generated');
     }
 
+    // Calculate Business Fit for each keyword
+    const keywords: KeywordWithFit[] = rawKeywords.map(keyword =>
+      calculateBusinessFit(
+        keyword,
+        platform as Platform,
+        goal as Goal,
+        strategy as Strategy,
+        userLevel
+      )
+    );
+
+    // Sort by Business Fit Score (highest first)
+    keywords.sort((a, b) => b.businessFitScore - a.businessFitScore);
+
+    // Group keywords by type
+    const grouped = {
+      buying: keywords.filter(k => k.type === 'buying'),
+      question: keywords.filter(k => k.type === 'question'),
+      comparison: keywords.filter(k => k.type === 'comparison'),
+      informational: keywords.filter(k => k.type === 'informational'),
+    };
+
     return NextResponse.json({
       keywords,
+      grouped,
       count: keywords.length,
+      remaining: usage.remaining,
+      isPro: usage.isPro,
+      userProfile: {
+        platform,
+        goal,
+        strategy,
+        level: userLevel,
+      },
     });
   } catch (error: any) {
     console.error('Generation error:', error);
