@@ -1,16 +1,18 @@
 import { NextRequest, NextResponse } from 'next/server';
-import Stripe from 'stripe';
-
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!) as any;
-
-const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET!;
 
 export async function POST(req: NextRequest) {
   try {
+    // Import Stripe dynamically
+    const Stripe = (await import('stripe')).default;
+    const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '', {
+      apiVersion: '2024-12-18.acacia' as any,
+    });
+
+    const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET!;
     const body = await req.text();
     const sig = req.headers.get('stripe-signature')!;
 
-    let event: Stripe.Event;
+    let event;
 
     try {
       event = stripe.webhooks.constructEvent(body, sig, webhookSecret);
@@ -25,7 +27,7 @@ export async function POST(req: NextRequest) {
     // Handle the event
     switch (event.type) {
       case 'checkout.session.completed':
-        const session = event.data.object as Stripe.Checkout.Session;
+        const session = event.data.object as any;
         
         // Update user to Pro in Clerk
         if (session.client_reference_id) {
@@ -51,10 +53,7 @@ export async function POST(req: NextRequest) {
         break;
 
       case 'customer.subscription.deleted':
-        const subscription = event.data.object as Stripe.Subscription;
-        
-        // Find user by customer ID and remove Pro status
-        // Note: You'll need to store customer ID mapping for this to work
+        const subscription = event.data.object as any;
         console.log('Subscription deleted:', subscription.id);
         break;
 
@@ -71,3 +70,6 @@ export async function POST(req: NextRequest) {
     );
   }
 }
+
+export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';

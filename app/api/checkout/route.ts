@@ -1,11 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { currentUser } from '@clerk/nextjs/server';
-import Stripe from 'stripe';
-
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!) as any;
 
 export async function POST(req: NextRequest) {
   try {
+    // Import Stripe dynamically to avoid build-time errors
+    const Stripe = (await import('stripe')).default;
+    const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '', {
+      apiVersion: '2024-12-18.acacia' as any,
+    });
+
     const user = await currentUser();
 
     if (!user) {
@@ -42,3 +45,6 @@ export async function POST(req: NextRequest) {
     );
   }
 }
+
+export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
