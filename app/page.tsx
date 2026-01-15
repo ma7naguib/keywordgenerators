@@ -12,15 +12,12 @@ export default function Home() {
       {/* Header */}
       <header className="bg-white/80 backdrop-blur-md shadow-sm sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 py-4 sm:py-6 flex justify-between items-center gap-2 sm:gap-4">
-          <Link href="/" className="flex items-center gap-2 sm:gap-3 group">
+          <Link href="/" className="group">
             <img
-              src="/logo.png"
-              alt="KeywordGenerators Logo"
-              className="w-8 h-8 sm:w-10 sm:h-10 object-contain transition-transform group-hover:scale-110 drop-shadow-lg"
+              src="/logo.svg"
+              alt="KeywordGenerators - AI-Powered Keyword Research"
+              className="h-10 sm:h-12 md:h-14 lg:h-16 w-auto object-contain transition-transform group-hover:scale-105"
             />
-            <h1 className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
-              KeywordGenerators
-            </h1>
           </Link>
 
           <div className="flex gap-2 sm:gap-3 md:gap-4 items-center">

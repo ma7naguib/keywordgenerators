@@ -146,15 +146,12 @@ function GeneratePageContent() {
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
       <header className="bg-white shadow-sm">
         <div className="max-w-7xl mx-auto px-4 py-6 flex justify-between items-center">
-          <Link href="/" className="flex items-center gap-2 sm:gap-3 group">
+          <Link href="/" className="group">
             <img
-              src="/logo.png"
-              alt="KeywordGenerators Logo"
-              className="w-8 h-8 sm:w-10 sm:h-10 object-contain transition-transform group-hover:scale-110 drop-shadow-lg"
+              src="/logo.svg"
+              alt="KeywordGenerators - AI-Powered Keyword Research"
+              className="h-10 sm:h-12 md:h-14 w-auto object-contain transition-transform group-hover:scale-105"
             />
-            <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-indigo-600">
-              KeywordGenerators
-            </h1>
           </Link>
           <div className="flex gap-4 items-center">
             <Link href="/">
@@ -322,15 +319,15 @@ function GeneratePageContent() {
                                   💎 {kw.businessFitScore}
                                 </span>
                                 <span className={`w-3 h-3 rounded-full ${kw.competition === 'low' ? 'bg-green-500' :
-                                    kw.competition === 'medium' ? 'bg-yellow-500' :
-                                      'bg-red-500'
+                                  kw.competition === 'medium' ? 'bg-yellow-500' :
+                                    'bg-red-500'
                                   }`} title={`${kw.competition} competition`} />
                               </div>
                               <div className="flex items-center gap-4 text-sm text-gray-600 mb-2">
                                 <span className="font-medium">{formatVolume(kw.volumeEstimate)} searches/mo</span>
                                 <span className={`px-2 py-1 rounded text-xs font-semibold ${kw.competition === 'low' ? 'bg-green-100 text-green-700' :
-                                    kw.competition === 'medium' ? 'bg-yellow-100 text-yellow-700' :
-                                      'bg-red-100 text-red-700'
+                                  kw.competition === 'medium' ? 'bg-yellow-100 text-yellow-700' :
+                                    'bg-red-100 text-red-700'
                                   }`}>
                                   {kw.competition} competition
                                 </span>
@@ -388,15 +385,15 @@ function GeneratePageContent() {
                                     💎 {kw.businessFitScore}
                                   </span>
                                   <span className={`w-3 h-3 rounded-full ${kw.competition === 'low' ? 'bg-green-500' :
-                                      kw.competition === 'medium' ? 'bg-yellow-500' :
-                                        'bg-red-500'
+                                    kw.competition === 'medium' ? 'bg-yellow-500' :
+                                      'bg-red-500'
                                     }`} title={`${kw.competition} competition`} />
                                 </div>
                                 <div className="flex items-center gap-4 text-sm text-gray-600 mb-2">
                                   <span className="font-medium">{formatVolume(kw.volumeEstimate)} searches/mo</span>
                                   <span className={`px-2 py-1 rounded text-xs font-semibold ${kw.competition === 'low' ? 'bg-green-100 text-green-700' :
-                                      kw.competition === 'medium' ? 'bg-yellow-100 text-yellow-700' :
-                                        'bg-red-100 text-red-700'
+                                    kw.competition === 'medium' ? 'bg-yellow-100 text-yellow-700' :
+                                      'bg-red-100 text-red-700'
                                     }`}>
                                     {kw.competition} competition
                                   </span>

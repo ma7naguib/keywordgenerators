@@ -19,15 +19,12 @@ export default function SuccessPage() {
       <div className="max-w-2xl w-full">
         {/* Header */}
         <div className="text-center mb-8">
-          <Link href="/" className="inline-flex items-center gap-2 sm:gap-3 group">
-            <img 
-              src="/logo.png" 
-              alt="KeywordGenerators Logo" 
-              className="w-12 h-12 sm:w-16 sm:h-16 object-contain transition-transform group-hover:scale-110 drop-shadow-lg"
+          <Link href="/" className="group">
+            <img
+              src="/logo.svg"
+              alt="KeywordGenerators - AI-Powered Keyword Research"
+              className="h-12 sm:h-14 md:h-16 w-auto object-contain transition-transform group-hover:scale-105"
             />
-            <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-indigo-600">
-              KeywordGenerators
-            </h1>
           </Link>
         </div>
 
@@ -43,7 +40,7 @@ export default function SuccessPage() {
           <h2 className="text-3xl sm:text-4xl font-bold mb-4 text-gray-900">
             🎉 Welcome to Pro!
           </h2>
-          
+
           <p className="text-lg sm:text-xl text-gray-600 mb-8">
             Your subscription is now active. You have unlimited access to all Pro features!
           </p>
