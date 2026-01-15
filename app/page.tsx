@@ -47,7 +47,7 @@ export default function Home() {
       </header>
 
       {/* Hero Section */}
-      <main className="max-w-7xl mx-auto px-4 py-12 sm:py-16 md:py-20">
+      <main className="max-w-7xl mx-auto px-4 py-8 sm:py-12 md:py-16">
         <div className="text-center">
           {/* Badge */}
           <div className="inline-flex items-center gap-2 bg-indigo-100 text-indigo-700 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full text-xs sm:text-sm font-semibold mb-4 sm:mb-6 animate-pulse">
@@ -70,7 +70,7 @@ export default function Home() {
           </p>
 
           {/* CTA Buttons */}
-          <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center items-center mb-6 sm:mb-8 px-4">
+          <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center items-center mb-4 sm:mb-6 px-4">
             <Link href="/onboarding" className="w-full sm:w-auto">
               <button className="w-full sm:w-auto bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-6 sm:px-8 md:px-10 py-3 sm:py-4 md:py-5 rounded-xl text-sm sm:text-base md:text-lg font-bold hover:from-indigo-700 hover:to-purple-700 transition shadow-2xl hover:shadow-indigo-500/50 hover:scale-105 transform">
                 🚀 Start Free Trial
