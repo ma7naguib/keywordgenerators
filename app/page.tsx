@@ -12,12 +12,17 @@ export default function Home() {
       {/* Header */}
       <header className="bg-white/80 backdrop-blur-md shadow-sm sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 py-4 sm:py-6 flex justify-between items-center gap-2 sm:gap-4">
-          <Link href="/">
-            <h1 className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent cursor-pointer">
+          <Link href="/" className="flex items-center gap-2 sm:gap-3 group">
+            <img
+              src="/logo.png"
+              alt="KeywordGenerators Logo"
+              className="w-8 h-8 sm:w-10 sm:h-10 object-contain transition-transform group-hover:scale-110 drop-shadow-lg"
+            />
+            <h1 className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
               KeywordGenerators
             </h1>
           </Link>
-          
+
           <div className="flex gap-2 sm:gap-3 md:gap-4 items-center">
             <SignedOut>
               <SignInButton mode="modal">
@@ -31,7 +36,7 @@ export default function Home() {
                 </button>
               </Link>
             </SignedOut>
-            
+
             <SignedIn>
               <Link href="/generate">
                 <button className="text-gray-600 hover:text-gray-900 font-semibold transition text-xs sm:text-sm md:text-base whitespace-nowrap">
@@ -62,11 +67,11 @@ export default function Home() {
               Fit YOUR Business
             </span>
           </h2>
-          
+
           <p className="text-sm sm:text-base md:text-lg lg:text-xl text-gray-600 mb-6 sm:mb-8 max-w-2xl mx-auto px-4">
             Get personalized keyword strategies tailored to your platform, goals, and competition level.
           </p>
-          
+
           {/* CTA Buttons */}
           <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center items-center mb-6 sm:mb-8 px-4">
             <Link href="/onboarding" className="w-full sm:w-auto">
@@ -80,7 +85,7 @@ export default function Home() {
               </button>
             </Link>
           </div>
-          
+
           {/* Fixed: Better mobile spacing */}
           <div className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-4 text-xs sm:text-sm text-gray-500 px-4">
             <span className="flex items-center gap-1">✨ No credit card required</span>
@@ -133,7 +138,7 @@ export default function Home() {
             <h3 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-3 sm:mb-4 text-gray-900">How It Works</h3>
             <p className="text-base sm:text-lg md:text-xl text-gray-600 px-4">Get personalized keywords in 3 simple steps</p>
           </div>
-          
+
           <div className="max-w-5xl mx-auto">
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
               {/* Step 1 */}
@@ -150,7 +155,7 @@ export default function Home() {
                 {/* Connector Line */}
                 <div className="hidden lg:block absolute top-8 -right-4 w-8 h-1 bg-gradient-to-r from-purple-500 to-pink-500"></div>
               </div>
-              
+
               {/* Step 2 */}
               <div className="relative">
                 <div className="bg-white rounded-2xl p-6 sm:p-8 shadow-lg hover:shadow-xl transition border border-gray-100 h-full">
@@ -165,7 +170,7 @@ export default function Home() {
                 {/* Connector Line */}
                 <div className="hidden lg:block absolute top-8 -right-4 w-8 h-1 bg-gradient-to-r from-pink-500 to-red-500"></div>
               </div>
-              
+
               {/* Step 3 */}
               <div className="sm:col-span-2 lg:col-span-1">
                 <div className="bg-white rounded-2xl p-6 sm:p-8 shadow-lg hover:shadow-xl transition border border-gray-100 h-full">
@@ -188,7 +193,7 @@ export default function Home() {
             <h3 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-3 sm:mb-4 text-gray-900">Simple Pricing</h3>
             <p className="text-base sm:text-lg md:text-xl text-gray-600 px-4">Start free. Upgrade when you're ready.</p>
           </div>
-          
+
           <div className="grid sm:grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8 max-w-4xl mx-auto">
             {/* Free Plan */}
             <div className="bg-white rounded-2xl p-6 sm:p-8 border-2 border-gray-200 hover:border-indigo-300 transition hover:shadow-xl">

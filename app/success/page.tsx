@@ -1,12 +1,12 @@
 'use client';
 
-import Link from 'next/link';
 import { useEffect } from 'react';
+import Link from 'next/link';
 import confetti from 'canvas-confetti';
 
 export default function SuccessPage() {
   useEffect(() => {
-    // Celebrate! 🎉
+    // Confetti animation
     confetti({
       particleCount: 100,
       spread: 70,
@@ -16,31 +16,83 @@ export default function SuccessPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center px-4">
-      <div className="max-w-md w-full bg-white rounded-2xl shadow-xl p-8 text-center">
-        <div className="text-6xl mb-4">🎉</div>
-        <h1 className="text-3xl font-bold mb-4">Welcome to Pro!</h1>
-        <p className="text-gray-600 mb-8">
-          Your payment was successful. You now have unlimited access to all Pro features!
-        </p>
-        
-        <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-8">
-          <p className="text-green-800 font-semibold mb-2">What's included:</p>
-          <ul className="text-sm text-green-700 space-y-1">
-            <li>✓ Unlimited searches</li>
-            <li>✓ 50+ keywords per search</li>
-            <li>✓ Priority support</li>
-            <li>✓ Advanced features</li>
-          </ul>
+      <div className="max-w-2xl w-full">
+        {/* Header */}
+        <div className="text-center mb-8">
+          <Link href="/" className="inline-flex items-center gap-2 sm:gap-3 group">
+            <img 
+              src="/logo.png" 
+              alt="KeywordGenerators Logo" 
+              className="w-12 h-12 sm:w-16 sm:h-16 object-contain transition-transform group-hover:scale-110 drop-shadow-lg"
+            />
+            <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-indigo-600">
+              KeywordGenerators
+            </h1>
+          </Link>
         </div>
 
-        <Link href="/generate">
-          <button className="w-full bg-indigo-600 text-white py-3 rounded-lg font-semibold hover:bg-indigo-700 transition">
-            Start Generating Keywords
-          </button>
-        </Link>
+        {/* Success Card */}
+        <div className="bg-white rounded-2xl shadow-2xl p-8 sm:p-12 text-center">
+          {/* Success Icon */}
+          <div className="w-20 h-20 sm:w-24 sm:h-24 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
+            <svg className="w-12 h-12 sm:w-16 sm:h-16 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+            </svg>
+          </div>
 
-        <p className="text-sm text-gray-500 mt-4">
-          You can manage your subscription in your account settings.
+          <h2 className="text-3xl sm:text-4xl font-bold mb-4 text-gray-900">
+            🎉 Welcome to Pro!
+          </h2>
+          
+          <p className="text-lg sm:text-xl text-gray-600 mb-8">
+            Your subscription is now active. You have unlimited access to all Pro features!
+          </p>
+
+          {/* Features List */}
+          <div className="bg-indigo-50 rounded-xl p-6 mb-8 text-left">
+            <h3 className="font-bold text-lg mb-4 text-indigo-900">What you get with Pro:</h3>
+            <ul className="space-y-3">
+              <li className="flex items-center gap-3">
+                <span className="text-green-500 text-xl">✓</span>
+                <span className="text-gray-700">Unlimited keyword searches</span>
+              </li>
+              <li className="flex items-center gap-3">
+                <span className="text-green-500 text-xl">✓</span>
+                <span className="text-gray-700">50 keywords per search</span>
+              </li>
+              <li className="flex items-center gap-3">
+                <span className="text-green-500 text-xl">✓</span>
+                <span className="text-gray-700">Export to CSV</span>
+              </li>
+              <li className="flex items-center gap-3">
+                <span className="text-green-500 text-xl">✓</span>
+                <span className="text-gray-700">Full Business Fit breakdown</span>
+              </li>
+              <li className="flex items-center gap-3">
+                <span className="text-green-500 text-xl">✓</span>
+                <span className="text-gray-700">Priority support</span>
+              </li>
+            </ul>
+          </div>
+
+          {/* CTA Buttons */}
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Link href="/generate" className="flex-1">
+              <button className="w-full bg-indigo-600 text-white px-8 py-4 rounded-xl font-bold text-lg hover:bg-indigo-700 transition shadow-lg">
+                Start Generating Keywords 🚀
+              </button>
+            </Link>
+            <Link href="/" className="flex-1">
+              <button className="w-full bg-white text-gray-700 px-8 py-4 rounded-xl font-semibold text-lg hover:bg-gray-50 transition border-2 border-gray-200">
+                Back to Home
+              </button>
+            </Link>
+          </div>
+        </div>
+
+        {/* Support */}
+        <p className="text-center text-gray-500 mt-8 text-sm">
+          Need help? Contact us via the chat widget or email support@keywordgenerators.com
         </p>
       </div>
     </div>

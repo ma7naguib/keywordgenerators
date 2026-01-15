@@ -68,8 +68,13 @@ export default function OnboardingPage() {
       {/* Header */}
       <header className="bg-white shadow-sm">
         <div className="max-w-7xl mx-auto px-4 py-4 sm:py-6">
-          <Link href="/">
-            <h1 className="text-2xl sm:text-3xl font-bold text-indigo-600 cursor-pointer">
+          <Link href="/" className="flex items-center gap-2 sm:gap-3 group">
+            <img
+              src="/logo.png"
+              alt="KeywordGenerators Logo"
+              className="w-8 h-8 sm:w-10 sm:h-10 object-contain transition-transform group-hover:scale-110 drop-shadow-lg"
+            />
+            <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-indigo-600">
               KeywordGenerators
             </h1>
           </Link>
@@ -114,11 +119,10 @@ export default function OnboardingPage() {
                   <button
                     key={option.value}
                     onClick={() => handlePlatformSelect(option.value as Platform)}
-                    className={`p-4 sm:p-6 rounded-xl border-2 text-left transition ${
-                      platform === option.value
+                    className={`p-4 sm:p-6 rounded-xl border-2 text-left transition ${platform === option.value
                         ? 'border-indigo-600 bg-indigo-50'
                         : 'border-gray-200 hover:border-indigo-300'
-                    }`}
+                      }`}
                   >
                     <div className="flex items-start gap-3 sm:gap-4">
                       <span className="text-2xl sm:text-3xl">{option.icon}</span>
@@ -153,11 +157,10 @@ export default function OnboardingPage() {
                   <button
                     key={option.value}
                     onClick={() => handleGoalSelect(option.value as Goal)}
-                    className={`p-4 sm:p-6 rounded-xl border-2 text-left transition ${
-                      goal === option.value
+                    className={`p-4 sm:p-6 rounded-xl border-2 text-left transition ${goal === option.value
                         ? 'border-indigo-600 bg-indigo-50'
                         : 'border-gray-200 hover:border-indigo-300'
-                    }`}
+                      }`}
                   >
                     <div className="flex items-start gap-3 sm:gap-4">
                       <span className="text-2xl sm:text-3xl">{option.icon}</span>
@@ -192,11 +195,10 @@ export default function OnboardingPage() {
                   <button
                     key={option.value}
                     onClick={() => handleStrategySelect(option.value as Strategy)}
-                    className={`p-4 sm:p-6 rounded-xl border-2 text-left transition ${
-                      strategy === option.value
+                    className={`p-4 sm:p-6 rounded-xl border-2 text-left transition ${strategy === option.value
                         ? 'border-indigo-600 bg-indigo-50'
                         : 'border-gray-200 hover:border-indigo-300'
-                    }`}
+                      }`}
                   >
                     <div className="flex items-start gap-3 sm:gap-4">
                       <span className="text-2xl sm:text-3xl">{option.icon}</span>

@@ -32,8 +32,13 @@ export default function PricingPage() {
       {/* Header */}
       <header className="bg-white shadow-sm">
         <div className="max-w-7xl mx-auto px-4 py-6 flex justify-between items-center">
-          <Link href="/">
-            <h1 className="text-3xl font-bold text-indigo-600 cursor-pointer">
+          <Link href="/" className="flex items-center gap-2 sm:gap-3 group">
+            <img
+              src="/logo.png"
+              alt="KeywordGenerators Logo"
+              className="w-8 h-8 sm:w-10 sm:h-10 object-contain transition-transform group-hover:scale-110 drop-shadow-lg"
+            />
+            <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-indigo-600">
               KeywordGenerators
             </h1>
           </Link>

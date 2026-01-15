@@ -65,7 +65,7 @@ function GeneratePageContent() {
     // Check localStorage for anonymous users
     if (typeof window !== 'undefined') {
       const hasUsedFreeTrial = localStorage.getItem('freeTrialUsed');
-      
+
       if (hasUsedFreeTrial === 'true') {
         setError('Free trial used! Sign up to continue or upgrade to Pro for unlimited searches.');
         return;
@@ -146,8 +146,13 @@ function GeneratePageContent() {
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
       <header className="bg-white shadow-sm">
         <div className="max-w-7xl mx-auto px-4 py-6 flex justify-between items-center">
-          <Link href="/">
-            <h1 className="text-3xl font-bold text-indigo-600 cursor-pointer">
+          <Link href="/" className="flex items-center gap-2 sm:gap-3 group">
+            <img
+              src="/logo.png"
+              alt="KeywordGenerators Logo"
+              className="w-8 h-8 sm:w-10 sm:h-10 object-contain transition-transform group-hover:scale-110 drop-shadow-lg"
+            />
+            <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-indigo-600">
               KeywordGenerators
             </h1>
           </Link>
@@ -226,8 +231,8 @@ function GeneratePageContent() {
               {loading ? (
                 <span className="flex flex-col items-center justify-center gap-1">
                   <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none"/>
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"/>
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
                   </svg>
                   <span className="text-sm">🔍 Analyzing... 🎯 Finding opportunities... ✨ Personalizing...</span>
                 </span>
@@ -299,11 +304,11 @@ function GeneratePageContent() {
                         {copiedText === 'main' ? '✓ Copied!' : '📋 Copy All'}
                       </button>
                     </div>
-                    
+
                     <div className="space-y-2">
                       {[...grouped.buying, ...grouped.comparison, ...grouped.informational].map((kw, idx) => (
-                        <div 
-                          key={idx} 
+                        <div
+                          key={idx}
                           onClick={() => copyKeyword(kw.text)}
                           className="bg-white p-4 rounded-lg shadow-sm hover:shadow-md transition cursor-pointer group"
                         >
@@ -316,26 +321,24 @@ function GeneratePageContent() {
                                 <span className="px-2 py-1 bg-indigo-100 text-indigo-700 text-xs font-bold rounded">
                                   💎 {kw.businessFitScore}
                                 </span>
-                                <span className={`w-3 h-3 rounded-full ${
-                                  kw.competition === 'low' ? 'bg-green-500' :
-                                  kw.competition === 'medium' ? 'bg-yellow-500' :
-                                  'bg-red-500'
-                                }`} title={`${kw.competition} competition`} />
+                                <span className={`w-3 h-3 rounded-full ${kw.competition === 'low' ? 'bg-green-500' :
+                                    kw.competition === 'medium' ? 'bg-yellow-500' :
+                                      'bg-red-500'
+                                  }`} title={`${kw.competition} competition`} />
                               </div>
                               <div className="flex items-center gap-4 text-sm text-gray-600 mb-2">
                                 <span className="font-medium">{formatVolume(kw.volumeEstimate)} searches/mo</span>
-                                <span className={`px-2 py-1 rounded text-xs font-semibold ${
-                                  kw.competition === 'low' ? 'bg-green-100 text-green-700' :
-                                  kw.competition === 'medium' ? 'bg-yellow-100 text-yellow-700' :
-                                  'bg-red-100 text-red-700'
-                                }`}>
+                                <span className={`px-2 py-1 rounded text-xs font-semibold ${kw.competition === 'low' ? 'bg-green-100 text-green-700' :
+                                    kw.competition === 'medium' ? 'bg-yellow-100 text-yellow-700' :
+                                      'bg-red-100 text-red-700'
+                                  }`}>
                                   {kw.competition} competition
                                 </span>
                                 <span className="text-xs">{kw.moneyLabel}</span>
                               </div>
                               <p className="text-sm text-gray-700">💡 {kw.reasoning}</p>
                             </div>
-                            <button 
+                            <button
                               onClick={(e) => {
                                 e.stopPropagation();
                                 copyKeyword(kw.text);
@@ -367,10 +370,10 @@ function GeneratePageContent() {
                           {copiedText === 'questions' ? '✓ Copied!' : '📋 Copy All'}
                         </button>
                       </div>
-                      
+
                       <div className="space-y-2">
                         {grouped.question.map((kw, idx) => (
-                          <div 
+                          <div
                             key={idx}
                             onClick={() => copyKeyword(kw.text)}
                             className="bg-white p-4 rounded-lg shadow-sm hover:shadow-md transition cursor-pointer group"
@@ -384,26 +387,24 @@ function GeneratePageContent() {
                                   <span className="px-2 py-1 bg-indigo-100 text-indigo-700 text-xs font-bold rounded">
                                     💎 {kw.businessFitScore}
                                   </span>
-                                  <span className={`w-3 h-3 rounded-full ${
-                                    kw.competition === 'low' ? 'bg-green-500' :
-                                    kw.competition === 'medium' ? 'bg-yellow-500' :
-                                    'bg-red-500'
-                                  }`} title={`${kw.competition} competition`} />
+                                  <span className={`w-3 h-3 rounded-full ${kw.competition === 'low' ? 'bg-green-500' :
+                                      kw.competition === 'medium' ? 'bg-yellow-500' :
+                                        'bg-red-500'
+                                    }`} title={`${kw.competition} competition`} />
                                 </div>
                                 <div className="flex items-center gap-4 text-sm text-gray-600 mb-2">
                                   <span className="font-medium">{formatVolume(kw.volumeEstimate)} searches/mo</span>
-                                  <span className={`px-2 py-1 rounded text-xs font-semibold ${
-                                    kw.competition === 'low' ? 'bg-green-100 text-green-700' :
-                                    kw.competition === 'medium' ? 'bg-yellow-100 text-yellow-700' :
-                                    'bg-red-100 text-red-700'
-                                  }`}>
+                                  <span className={`px-2 py-1 rounded text-xs font-semibold ${kw.competition === 'low' ? 'bg-green-100 text-green-700' :
+                                      kw.competition === 'medium' ? 'bg-yellow-100 text-yellow-700' :
+                                        'bg-red-100 text-red-700'
+                                    }`}>
                                     {kw.competition} competition
                                   </span>
                                   <span className="text-xs">{kw.moneyLabel}</span>
                                 </div>
                                 <p className="text-sm text-gray-700">💡 {kw.reasoning}</p>
                               </div>
-                              <button 
+                              <button
                                 onClick={(e) => {
                                   e.stopPropagation();
                                   copyKeyword(kw.text);

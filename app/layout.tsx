@@ -7,10 +7,64 @@ import Script from 'next/script';
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  title: 'KeywordGenerators - Keywords That Fit Your Business',
-  description: 'Get personalized keyword strategies tailored to your platform, goals, and competition level. Not just keywords. A strategy.',
+  title: 'KeywordGenerators - AI-Powered Keyword Research',
+  description: 'Get personalized keywords with Business Fit Scores tailored to your platform, goals, and strategy. AI-powered keyword research that fits YOUR business.',
+  keywords: ['keyword research', 'SEO tools', 'AI keywords', 'business fit score', 'keyword generator', 'content marketing', 'SEO strategy'],
+  authors: [{ name: 'KeywordGenerators' }],
+  creator: 'KeywordGenerators',
+  publisher: 'KeywordGenerators',
+  metadataBase: new URL('https://keywordgenerators.com'),
   icons: {
-    icon: '/favicon.ico',
+    icon: [
+      { url: '/favicon.ico', sizes: 'any' },
+      { url: '/favicon-16x16.png', sizes: '16x16', type: 'image/png' },
+      { url: '/favicon-32x32.png', sizes: '32x32', type: 'image/png' },
+    ],
+    apple: [
+      { url: '/apple-touch-icon.png', sizes: '180x180', type: 'image/png' },
+    ],
+    other: [
+      { rel: 'android-chrome', url: '/android-chrome-192x192.png', sizes: '192x192' },
+      { rel: 'android-chrome', url: '/android-chrome-512x512.png', sizes: '512x512' },
+    ],
+  },
+  manifest: '/site.webmanifest',
+  openGraph: {
+    type: 'website',
+    locale: 'en_US',
+    url: 'https://keywordgenerators.com',
+    title: 'KeywordGenerators - AI-Powered Keyword Research',
+    description: 'Get personalized keywords with Business Fit Scores tailored to your platform and goals',
+    siteName: 'KeywordGenerators',
+    images: [
+      {
+        url: '/logo.png',
+        width: 1200,
+        height: 630,
+        alt: 'KeywordGenerators Logo - AI-Powered Keyword Research',
+      },
+    ],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'KeywordGenerators - AI-Powered Keyword Research',
+    description: 'Get personalized keywords with Business Fit Scores',
+    images: ['/logo.png'],
+    creator: '@keywordgen',
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-video-preview': -1,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
+  },
+  verification: {
+    // google: 'your-google-verification-code', // Add later from Google Search Console
   },
 };
 
@@ -22,6 +76,9 @@ export default function RootLayout({
   return (
     <ClerkProvider>
       <html lang="en">
+        <head>
+          <link rel="canonical" href="https://keywordgenerators.com" />
+        </head>
         <body className={inter.className}>
           {children}
           
