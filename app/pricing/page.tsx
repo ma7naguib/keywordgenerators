@@ -32,15 +32,12 @@ export default function PricingPage() {
       {/* Header */}
       <header className="bg-white shadow-sm">
         <div className="max-w-7xl mx-auto px-4 py-6 flex justify-between items-center">
-          <Link href="/" className="flex items-center gap-2 sm:gap-3 group">
+          <Link href="/" className="group">
             <img
-              src="/logo.png"
-              alt="KeywordGenerators Logo"
-              className="w-8 h-8 sm:w-10 sm:h-10 object-contain transition-transform group-hover:scale-110 drop-shadow-lg"
+              src="/logo.svg"
+              alt="KeywordGenerators - AI-Powered Keyword Research"
+              className="h-10 sm:h-12 md:h-14 w-auto object-contain transition-transform group-hover:scale-105"
             />
-            <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-indigo-600">
-              KeywordGenerators
-            </h1>
           </Link>
           <div className="flex gap-4 items-center">
             <Link href="/generate">
@@ -80,6 +77,7 @@ export default function PricingPage() {
             <p className="text-4xl font-bold mb-6">
               $0<span className="text-lg text-gray-500">/month</span>
             </p>
+            <p className="text-sm text-gray-500 mb-6">Perfect to try it out</p>
             <ul className="space-y-4 mb-8">
               <li className="flex items-center">
                 <span className="text-green-500 mr-3 text-xl">✓</span>
@@ -108,7 +106,7 @@ export default function PricingPage() {
           {/* Pro Plan */}
           <div className="bg-white rounded-2xl shadow-xl p-8 border-2 border-indigo-600 relative">
             <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 bg-indigo-600 text-white px-6 py-1 rounded-full text-sm font-semibold">
-              Most Popular
+              ⭐ Most Popular
             </div>
             <h3 className="text-2xl font-bold mb-2">Pro</h3>
             <p className="text-4xl font-bold mb-6">
@@ -141,7 +139,7 @@ export default function PricingPage() {
             <SignedOut>
               <SignInButton mode="modal">
                 <button className="w-full bg-indigo-600 text-white py-3 rounded-lg font-semibold hover:bg-indigo-700 transition">
-                  Sign In to Upgrade
+                  Start Free Trial
                 </button>
               </SignInButton>
             </SignedOut>
