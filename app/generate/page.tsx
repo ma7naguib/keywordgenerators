@@ -11,28 +11,20 @@ import {
 } from '@clerk/nextjs';
 
 interface KeywordResult {
-  text: string;
+  keyword: string;
+  length: 'short' | 'medium' | 'long';
+  searchVolume: string;
+  competition: 'low' | 'medium' | 'high';
   businessFitScore: number;
-  type: string;
-  competition: string;
-  volumeEstimate: number;
-  volumeLabel: string;
-  moneyLabel: string;
-  reasoning: string;
-}
-
-interface GroupedKeywords {
-  buying: KeywordResult[];
-  question: KeywordResult[];
-  comparison: KeywordResult[];
-  informational: KeywordResult[];
+  keywordType: 'sales' | 'traffic' | 'authority';
+  explanation: string;
 }
 
 function GeneratePageContent() {
   const searchParams = useSearchParams();
   const [topic, setTopic] = useState('');
   const [keywords, setKeywords] = useState<KeywordResult[]>([]);
-  const [grouped, setGrouped] = useState<GroupedKeywords | null>(null);
+  const [filteredKeywords, setFilteredKeywords] = useState<KeywordResult[]>([]);
   const [userProfile, setUserProfile] = useState<any>(null);
   const [remaining, setRemaining] = useState<number | null>(null);
   const [isPro, setIsPro] = useState(false);
@@ -40,6 +32,11 @@ function GeneratePageContent() {
   const [error, setError] = useState('');
   const [needsOnboarding, setNeedsOnboarding] = useState(false);
   const [copiedText, setCopiedText] = useState<string>('');
+
+  // Filters
+  const [lengthFilter, setLengthFilter] = useState<string>('all');
+  const [competitionFilter, setCompetitionFilter] = useState<string>('all');
+  const [sortBy, setSortBy] = useState<string>('score');
 
   const platform = searchParams.get('platform');
   const goal = searchParams.get('goal');
@@ -50,6 +47,36 @@ function GeneratePageContent() {
       setNeedsOnboarding(true);
     }
   }, [platform, goal, strategy]);
+
+  // Apply filters and sorting
+  useEffect(() => {
+    let filtered = [...keywords];
+
+    if (lengthFilter !== 'all') {
+      filtered = filtered.filter(kw => kw.length === lengthFilter);
+    }
+
+    if (competitionFilter !== 'all') {
+      filtered = filtered.filter(kw => kw.competition === competitionFilter);
+    }
+
+    if (sortBy === 'score') {
+      filtered.sort((a, b) => b.businessFitScore - a.businessFitScore);
+    } else if (sortBy === 'volume') {
+      filtered.sort((a, b) => {
+        const parseVolume = (vol: string) => {
+          const num = parseFloat(vol.replace(/[^\d.]/g, ''));
+          return vol.includes('K') ? num * 1000 : num;
+        };
+        return parseVolume(b.searchVolume) - parseVolume(a.searchVolume);
+      });
+    } else if (sortBy === 'competition') {
+      const compOrder = { low: 1, medium: 2, high: 3 };
+      filtered.sort((a, b) => compOrder[a.competition] - compOrder[b.competition]);
+    }
+
+    setFilteredKeywords(filtered);
+  }, [keywords, lengthFilter, competitionFilter, sortBy]);
 
   const generateKeywords = async () => {
     if (!topic.trim()) {
@@ -65,7 +92,6 @@ function GeneratePageContent() {
     // Check localStorage for anonymous users
     if (typeof window !== 'undefined') {
       const hasUsedFreeTrial = localStorage.getItem('freeTrialUsed');
-
       if (hasUsedFreeTrial === 'true') {
         setError('Free trial used! Sign up to continue or upgrade to Pro for unlimited searches.');
         return;
@@ -75,7 +101,6 @@ function GeneratePageContent() {
     setLoading(true);
     setError('');
     setKeywords([]);
-    setGrouped(null);
 
     try {
       const response = await fetch('/api/generate', {
@@ -90,8 +115,7 @@ function GeneratePageContent() {
         throw new Error(data.error || 'Failed to generate keywords');
       }
 
-      setKeywords(data.keywords);
-      setGrouped(data.grouped);
+      setKeywords(data.keywords || []);
       setUserProfile(data.userProfile);
       setRemaining(data.remaining);
       setIsPro(data.isPro);
@@ -108,7 +132,18 @@ function GeneratePageContent() {
   };
 
   const downloadCSV = () => {
-    const csv = keywords.map(k => k.text).join('\n');
+    const headers = ['Keyword', 'Length', 'Search Volume', 'Competition', 'Score', 'Type', 'Explanation'];
+    const rows = filteredKeywords.map(kw => [
+      kw.keyword,
+      kw.length,
+      kw.searchVolume,
+      kw.competition,
+      kw.businessFitScore,
+      kw.keywordType,
+      kw.explanation
+    ]);
+
+    const csv = [headers, ...rows].map(row => row.join(',')).join('\n');
     const blob = new Blob([csv], { type: 'text/csv' });
     const url = window.URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -123,23 +158,36 @@ function GeneratePageContent() {
     setTimeout(() => setCopiedText(''), 2000);
   };
 
-  const copyCategory = (categoryKeywords: KeywordResult[], categoryName: string) => {
-    const text = categoryKeywords.map(k => k.text).join('\n');
-    navigator.clipboard.writeText(text);
-    setCopiedText(categoryName);
-    setTimeout(() => setCopiedText(''), 2000);
-  };
-
   const copyAllKeywords = () => {
-    const text = keywords.map(k => k.text).join('\n');
+    const text = filteredKeywords.map(kw => kw.keyword).join('\n');
     navigator.clipboard.writeText(text);
     setCopiedText('all');
     setTimeout(() => setCopiedText(''), 2000);
   };
 
-  const formatVolume = (vol: number): string => {
-    if (vol >= 1000) return `~${(vol / 1000).toFixed(1)}K`;
-    return `~${vol}`;
+  const getLengthColor = (length: string) => {
+    if (length === 'short') return 'bg-green-100 text-green-700';
+    if (length === 'medium') return 'bg-blue-100 text-blue-700';
+    return 'bg-purple-100 text-purple-700';
+  };
+
+  const getCompetitionColor = (competition: string) => {
+    if (competition === 'low') return 'bg-green-500';
+    if (competition === 'medium') return 'bg-yellow-500';
+    return 'bg-red-500';
+  };
+
+  const getScoreColor = (score: number) => {
+    if (score >= 90) return 'text-green-600';
+    if (score >= 70) return 'text-yellow-600';
+    if (score >= 50) return 'text-orange-600';
+    return 'text-red-600';
+  };
+
+  const getTypeIcon = (type: string) => {
+    if (type === 'sales') return '📈';
+    if (type === 'traffic') return '🚀';
+    return '💼';
   };
 
   return (
@@ -191,7 +239,6 @@ function GeneratePageContent() {
             <div className="mb-6 p-4 bg-indigo-50 rounded-lg">
               <p className="text-sm text-indigo-800">
                 <strong>Your Strategy:</strong> {userProfile.platform} • {userProfile.goal} • {userProfile.strategy}
-                {userProfile.level && ` • ${userProfile.level} level`}
                 <Link href="/onboarding" className="ml-2 text-indigo-600 hover:underline text-sm">
                   Change
                 </Link>
@@ -205,6 +252,20 @@ function GeneratePageContent() {
           </p>
 
           <div className="space-y-4">
+            {/* ✅ FREE TRIAL WARNING BANNER */}
+            <SignedOut>
+              {!keywords.length && !error && (
+                <div className="bg-gradient-to-r from-green-50 to-blue-50 border-2 border-green-200 rounded-xl p-4">
+                  <p className="text-sm font-medium text-gray-800">
+                    🎁 <strong>Try it free:</strong> Get <strong>30 personalized keywords</strong>, no signup required!
+                  </p>
+                  <p className="text-xs text-gray-600 mt-1">
+                    Want more? Create a free account after for additional keywords.
+                  </p>
+                </div>
+              )}
+            </SignedOut>
+
             <div>
               <label className="block text-sm font-semibold mb-2">
                 Enter Your Topic
@@ -231,30 +292,39 @@ function GeneratePageContent() {
                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
                   </svg>
-                  <span className="text-sm">🔍 Analyzing... 🎯 Finding opportunities... ✨ Personalizing...</span>
+                  <span className="text-sm">🔍 Analyzing... 🎯 Personalizing...</span>
                 </span>
               ) : (
                 '🚀 Generate Personalized Keywords'
               )}
             </button>
 
+            {/* ✅ IMPROVED ERROR WITH SOFT PAYWALL */}
             {error && (
               <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
-                ⚠️ {error}
+                <p className="font-semibold mb-2">⚠️ {error}</p>
                 {(error.includes('Free trial used') || error.includes('Daily limit')) && (
-                  <div className="mt-3 flex gap-2">
-                    <SignedOut>
-                      <SignInButton mode="modal">
-                        <button className="flex-1 bg-green-600 text-white py-2 rounded-lg hover:bg-green-700 font-semibold">
-                          Sign Up (Free)
+                  <div className="mt-4 p-4 bg-white rounded-lg border border-gray-200">
+                    <p className="text-gray-900 font-semibold mb-2">
+                      💡 Want more keyword ideas?
+                    </p>
+                    <p className="text-gray-600 text-sm mb-4">
+                      Create a free account to unlock <strong>30 more keywords</strong> — or upgrade for unlimited access.
+                    </p>
+                    <div className="flex gap-2">
+                      <SignedOut>
+                        <SignInButton mode="modal">
+                          <button className="flex-1 bg-green-600 text-white py-2.5 px-4 rounded-lg hover:bg-green-700 font-semibold transition">
+                            Get 30 More (Free) →
+                          </button>
+                        </SignInButton>
+                      </SignedOut>
+                      <Link href="/pricing" className="flex-1">
+                        <button className="w-full bg-indigo-600 text-white py-2.5 px-4 rounded-lg hover:bg-indigo-700 font-semibold transition">
+                          Go Pro (Unlimited)
                         </button>
-                      </SignInButton>
-                    </SignedOut>
-                    <Link href="/pricing" className="flex-1">
-                      <button className="w-full bg-indigo-600 text-white py-2 rounded-lg hover:bg-indigo-700 font-semibold">
-                        Upgrade to Pro
-                      </button>
-                    </Link>
+                      </Link>
+                    </div>
                   </div>
                 )}
               </div>
@@ -263,159 +333,153 @@ function GeneratePageContent() {
 
           {keywords.length > 0 && (
             <div className="mt-8">
-              <div className="flex justify-between items-center mb-6">
+              {/* Header with Actions */}
+              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
                 <h3 className="text-2xl font-bold">
-                  Generated {keywords.length} Keywords 🎉
+                  {filteredKeywords.length} Keywords 🎉
                 </h3>
                 <div className="flex gap-2">
                   <button
                     onClick={copyAllKeywords}
-                    className="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 flex items-center gap-2 transition"
+                    className="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 flex items-center gap-2 transition text-sm"
                   >
                     {copiedText === 'all' ? '✓ Copied!' : '📋 Copy All'}
                   </button>
                   <button
                     onClick={downloadCSV}
-                    className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 flex items-center gap-2"
+                    className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 flex items-center gap-2 text-sm"
                   >
-                    📥 Download CSV
+                    📥 CSV
                   </button>
                 </div>
               </div>
 
-              {grouped && (
-                <div className="space-y-6">
-                  {/* Main Keywords */}
-                  <div className="bg-gradient-to-br from-green-50 to-blue-50 border-2 border-green-300 rounded-xl p-6">
-                    <div className="flex justify-between items-center mb-4">
-                      <div>
-                        <h4 className="text-2xl font-bold mb-1 flex items-center gap-2">
-                          🎯 Main Keywords ({grouped.buying.length + grouped.comparison.length + grouped.informational.length})
-                        </h4>
-                        <p className="text-sm text-gray-600">Commercial, buying intent & informational keywords</p>
+              {/* Filters */}
+              <div className="bg-gray-50 rounded-lg p-4 mb-6">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                  <div>
+                    <label className="block text-sm font-semibold mb-2">Length</label>
+                    <select
+                      value={lengthFilter}
+                      onChange={(e) => setLengthFilter(e.target.value)}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:border-indigo-600 focus:outline-none"
+                    >
+                      <option value="all">All</option>
+                      <option value="short">Short</option>
+                      <option value="medium">Medium</option>
+                      <option value="long">Long</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-semibold mb-2">Competition</label>
+                    <select
+                      value={competitionFilter}
+                      onChange={(e) => setCompetitionFilter(e.target.value)}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:border-indigo-600 focus:outline-none"
+                    >
+                      <option value="all">All</option>
+                      <option value="low">🟢 Low</option>
+                      <option value="medium">🟡 Medium</option>
+                      <option value="high">🔴 High</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-semibold mb-2">Sort By</label>
+                    <select
+                      value={sortBy}
+                      onChange={(e) => setSortBy(e.target.value)}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:border-indigo-600 focus:outline-none"
+                    >
+                      <option value="score">Score (High to Low)</option>
+                      <option value="volume">Volume (High to Low)</option>
+                      <option value="competition">Competition (Low to High)</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              {/* Keywords List */}
+              <div className="space-y-3">
+                {filteredKeywords.map((kw, idx) => (
+                  <div
+                    key={idx}
+                    className="bg-white border-2 border-gray-200 rounded-xl p-4 hover:border-indigo-300 hover:shadow-md transition cursor-pointer group"
+                    onClick={() => copyKeyword(kw.keyword)}
+                  >
+                    <div className="flex items-start justify-between gap-4 mb-3">
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <h4 className="font-bold text-lg group-hover:text-indigo-600 transition">
+                            {kw.keyword}
+                          </h4>
+                          <span className={`px-2 py-1 rounded-full text-xs font-bold ${getLengthColor(kw.length)}`}>
+                            {kw.length}
+                          </span>
+                        </div>
                       </div>
                       <button
-                        onClick={() => copyCategory([...grouped.buying, ...grouped.comparison, ...grouped.informational], 'main')}
-                        className="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 flex items-center gap-2 text-sm transition"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          copyKeyword(kw.keyword);
+                        }}
+                        className="opacity-0 group-hover:opacity-100 transition text-indigo-600 hover:text-indigo-800 text-sm font-semibold"
                       >
-                        {copiedText === 'main' ? '✓ Copied!' : '📋 Copy All'}
+                        {copiedText === kw.keyword ? '✓' : '📋'}
                       </button>
                     </div>
 
-                    <div className="space-y-2">
-                      {[...grouped.buying, ...grouped.comparison, ...grouped.informational].map((kw, idx) => (
-                        <div
-                          key={idx}
-                          onClick={() => copyKeyword(kw.text)}
-                          className="bg-white p-4 rounded-lg shadow-sm hover:shadow-md transition cursor-pointer group"
-                        >
-                          <div className="flex items-start justify-between gap-4">
-                            <div className="flex-1">
-                              <div className="flex items-center gap-2 mb-2">
-                                <span className="font-bold text-base group-hover:text-indigo-600 transition">
-                                  {kw.text}
-                                </span>
-                                <span className="px-2 py-1 bg-indigo-100 text-indigo-700 text-xs font-bold rounded">
-                                  💎 {kw.businessFitScore}
-                                </span>
-                                <span className={`w-3 h-3 rounded-full ${kw.competition === 'low' ? 'bg-green-500' :
-                                  kw.competition === 'medium' ? 'bg-yellow-500' :
-                                    'bg-red-500'
-                                  }`} title={`${kw.competition} competition`} />
-                              </div>
-                              <div className="flex items-center gap-4 text-sm text-gray-600 mb-2">
-                                <span className="font-medium">{formatVolume(kw.volumeEstimate)} searches/mo</span>
-                                <span className={`px-2 py-1 rounded text-xs font-semibold ${kw.competition === 'low' ? 'bg-green-100 text-green-700' :
-                                  kw.competition === 'medium' ? 'bg-yellow-100 text-yellow-700' :
-                                    'bg-red-100 text-red-700'
-                                  }`}>
-                                  {kw.competition} competition
-                                </span>
-                                <span className="text-xs">{kw.moneyLabel}</span>
-                              </div>
-                              <p className="text-sm text-gray-700">💡 {kw.reasoning}</p>
-                            </div>
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                copyKeyword(kw.text);
-                              }}
-                              className="opacity-0 group-hover:opacity-100 transition text-indigo-600 hover:text-indigo-800 text-sm font-semibold"
-                            >
-                              {copiedText === kw.text ? '✓ Copied!' : 'Copy'}
-                            </button>
-                          </div>
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-3">
+                      <div className="bg-gray-50 rounded-lg p-3 text-center">
+                        <div className="text-2xl font-bold mb-1">🎯</div>
+                        <div className={`text-xl font-bold ${getScoreColor(kw.businessFitScore)}`}>
+                          {kw.businessFitScore}
                         </div>
-                      ))}
+                        <div className="text-xs text-gray-600">Score</div>
+                      </div>
+
+                      <div className="bg-gray-50 rounded-lg p-3 text-center">
+                        <div className="text-2xl font-bold mb-1">📊</div>
+                        <div className="text-lg font-bold text-gray-900">
+                          {kw.searchVolume}
+                        </div>
+                        <div className="text-xs text-gray-600">Volume</div>
+                      </div>
+
+                      <div className="bg-gray-50 rounded-lg p-3 text-center">
+                        <div className={`w-4 h-4 rounded-full mx-auto mb-2 ${getCompetitionColor(kw.competition)}`} />
+                        <div className="text-lg font-bold capitalize text-gray-900">
+                          {kw.competition}
+                        </div>
+                        <div className="text-xs text-gray-600">Competition</div>
+                      </div>
+
+                      <div className="bg-gray-50 rounded-lg p-3 text-center">
+                        <div className="text-2xl font-bold mb-1">{getTypeIcon(kw.keywordType)}</div>
+                        <div className="text-lg font-bold capitalize text-gray-900">
+                          {kw.keywordType}
+                        </div>
+                        <div className="text-xs text-gray-600">Type</div>
+                      </div>
                     </div>
+
+                    <details className="mt-3">
+                      <summary className="text-sm text-indigo-600 hover:text-indigo-800 cursor-pointer font-semibold flex items-center gap-1">
+                        💡 Why this works?
+                      </summary>
+                      <p className="mt-2 text-sm text-gray-700 pl-4 border-l-2 border-indigo-200">
+                        {kw.explanation}
+                      </p>
+                    </details>
                   </div>
+                ))}
+              </div>
 
-                  {/* Questions */}
-                  {grouped.question.length > 0 && (
-                    <div className="bg-gradient-to-br from-blue-50 to-purple-50 border-2 border-blue-300 rounded-xl p-6">
-                      <div className="flex justify-between items-center mb-4">
-                        <div>
-                          <h4 className="text-2xl font-bold mb-1 flex items-center gap-2">
-                            ❓ Question Keywords ({grouped.question.length})
-                          </h4>
-                          <p className="text-sm text-gray-600">Perfect for content marketing & SEO</p>
-                        </div>
-                        <button
-                          onClick={() => copyCategory(grouped.question, 'questions')}
-                          className="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 flex items-center gap-2 text-sm transition"
-                        >
-                          {copiedText === 'questions' ? '✓ Copied!' : '📋 Copy All'}
-                        </button>
-                      </div>
-
-                      <div className="space-y-2">
-                        {grouped.question.map((kw, idx) => (
-                          <div
-                            key={idx}
-                            onClick={() => copyKeyword(kw.text)}
-                            className="bg-white p-4 rounded-lg shadow-sm hover:shadow-md transition cursor-pointer group"
-                          >
-                            <div className="flex items-start justify-between gap-4">
-                              <div className="flex-1">
-                                <div className="flex items-center gap-2 mb-2">
-                                  <span className="font-bold text-base group-hover:text-indigo-600 transition">
-                                    {kw.text}
-                                  </span>
-                                  <span className="px-2 py-1 bg-indigo-100 text-indigo-700 text-xs font-bold rounded">
-                                    💎 {kw.businessFitScore}
-                                  </span>
-                                  <span className={`w-3 h-3 rounded-full ${kw.competition === 'low' ? 'bg-green-500' :
-                                    kw.competition === 'medium' ? 'bg-yellow-500' :
-                                      'bg-red-500'
-                                    }`} title={`${kw.competition} competition`} />
-                                </div>
-                                <div className="flex items-center gap-4 text-sm text-gray-600 mb-2">
-                                  <span className="font-medium">{formatVolume(kw.volumeEstimate)} searches/mo</span>
-                                  <span className={`px-2 py-1 rounded text-xs font-semibold ${kw.competition === 'low' ? 'bg-green-100 text-green-700' :
-                                    kw.competition === 'medium' ? 'bg-yellow-100 text-yellow-700' :
-                                      'bg-red-100 text-red-700'
-                                    }`}>
-                                    {kw.competition} competition
-                                  </span>
-                                  <span className="text-xs">{kw.moneyLabel}</span>
-                                </div>
-                                <p className="text-sm text-gray-700">💡 {kw.reasoning}</p>
-                              </div>
-                              <button
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  copyKeyword(kw.text);
-                                }}
-                                className="opacity-0 group-hover:opacity-100 transition text-indigo-600 hover:text-indigo-800 text-sm font-semibold"
-                              >
-                                {copiedText === kw.text ? '✓ Copied!' : 'Copy'}
-                              </button>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
+              {filteredKeywords.length === 0 && (
+                <div className="text-center py-12 text-gray-500">
+                  <div className="text-4xl mb-2">🔍</div>
+                  <p>No keywords match your filters</p>
                 </div>
               )}
 
@@ -427,12 +491,12 @@ function GeneratePageContent() {
                       <strong>Pro Plan: Unlimited personalized keyword runs!</strong>
                     ) : (
                       <>
-                        <strong>Free tier:</strong> You've used your free personalized strategy run.
+                        <strong>Free tier:</strong> You've used your free run.
                         <Link href="/pricing">
                           <span className="text-indigo-600 hover:underline ml-1 cursor-pointer font-semibold">
                             Upgrade to Pro
                           </span>
-                        </Link> for unlimited runs + 50 keywords per search!
+                        </Link> for unlimited keywords!
                       </>
                     )}
                   </p>
@@ -442,7 +506,7 @@ function GeneratePageContent() {
               <SignedOut>
                 <div className="mt-6 bg-yellow-50 border border-yellow-200 rounded-lg p-4">
                   <p className="text-sm text-yellow-800">
-                    💡 <strong>Sign up for free</strong> to get your personalized keyword strategy!
+                    💡 <strong>Sign up for free</strong> to get more personalized keywords!
                     <SignInButton mode="modal">
                       <span className="text-indigo-600 hover:underline ml-1 cursor-pointer font-semibold">
                         Sign Up Now (Free)
