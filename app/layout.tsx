@@ -72,6 +72,20 @@ export default function RootLayout({
         <body className={inter.className}>
           {children}
 
+          {/* Google Analytics */}
+          <Script
+            src="https://www.googletagmanager.com/gtag/js?id=G-ZZZT0129DR"
+            strategy="afterInteractive"
+          />
+          <Script id="google-analytics" strategy="afterInteractive">
+            {`
+              window.dataLayer = window.dataLayer || [];
+              function gtag(){dataLayer.push(arguments);}
+              gtag('js', new Date());
+              gtag('config', 'G-ZZZT0129DR');
+            `}
+          </Script>
+
           {/* Tawk.to Chat Widget */}
           <Script
             id="tawk-to"

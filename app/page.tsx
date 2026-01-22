@@ -83,13 +83,33 @@ export default function Home() {
             </Link>
           </div>
 
-          {/* Fixed: Better mobile spacing */}
+          {/* Trust badges */}
           <div className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-4 text-xs sm:text-sm text-gray-500 px-4">
             <span className="flex items-center gap-1">✨ No credit card required</span>
             <span className="hidden sm:inline text-gray-300">•</span>
             <span className="flex items-center gap-1">🎁 1 free strategy</span>
             <span className="hidden sm:inline text-gray-300">•</span>
             <span className="flex items-center gap-1">⚡ Results in 5 seconds</span>
+          </div>
+        </div>
+
+        {/* Stats Section */}
+        <div className="mt-12 sm:mt-16 grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
+          <div className="bg-white/60 backdrop-blur-sm rounded-2xl p-4 sm:p-6 text-center border border-gray-100">
+            <div className="text-2xl sm:text-3xl md:text-4xl font-bold text-indigo-600 mb-1">50+</div>
+            <div className="text-xs sm:text-sm text-gray-600">Keywords per Search</div>
+          </div>
+          <div className="bg-white/60 backdrop-blur-sm rounded-2xl p-4 sm:p-6 text-center border border-gray-100">
+            <div className="text-2xl sm:text-3xl md:text-4xl font-bold text-purple-600 mb-1">5</div>
+            <div className="text-xs sm:text-sm text-gray-600">Platforms Supported</div>
+          </div>
+          <div className="bg-white/60 backdrop-blur-sm rounded-2xl p-4 sm:p-6 text-center border border-gray-100">
+            <div className="text-2xl sm:text-3xl md:text-4xl font-bold text-pink-600 mb-1">0-100</div>
+            <div className="text-xs sm:text-sm text-gray-600">Business Fit Score</div>
+          </div>
+          <div className="bg-white/60 backdrop-blur-sm rounded-2xl p-4 sm:p-6 text-center border border-gray-100">
+            <div className="text-2xl sm:text-3xl md:text-4xl font-bold text-red-500 mb-1">5s</div>
+            <div className="text-xs sm:text-sm text-gray-600">Average Generation</div>
           </div>
         </div>
 
@@ -126,6 +146,21 @@ export default function Home() {
             <p className="text-sm sm:text-base text-gray-600 leading-relaxed">
               Click any keyword to copy instantly. Export to CSV. Start ranking today.
             </p>
+          </div>
+        </div>
+
+        {/* Platform Support */}
+        <div className="mt-16 sm:mt-24 text-center">
+          <h3 className="text-xl sm:text-2xl font-bold text-gray-900 mb-6 sm:mb-8">Works with Your Platform</h3>
+          <div className="flex flex-wrap justify-center gap-4 sm:gap-6">
+            {['Etsy', 'Amazon', 'YouTube', 'Blog', 'Google SEO'].map((platform) => (
+              <div
+                key={platform}
+                className="bg-white px-6 sm:px-8 py-3 sm:py-4 rounded-xl shadow-md border border-gray-100 text-sm sm:text-base font-semibold text-gray-700 hover:border-indigo-300 hover:shadow-lg transition"
+              >
+                {platform}
+              </div>
+            ))}
           </div>
         </div>
 
@@ -263,15 +298,140 @@ export default function Home() {
               </Link>
             </div>
           </div>
+
+          {/* Money-back guarantee */}
+          <div className="text-center mt-8">
+            <p className="text-gray-600 flex items-center justify-center gap-2">
+              <span className="text-xl">🛡️</span>
+              7-day money-back guarantee • No questions asked
+            </p>
+          </div>
+        </div>
+
+        {/* FAQ Section */}
+        <div className="mt-16 sm:mt-24 md:mt-32">
+          <div className="text-center mb-8 sm:mb-12">
+            <h3 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">Frequently Asked Questions</h3>
+          </div>
+          <div className="max-w-3xl mx-auto space-y-4">
+            {[
+              {
+                q: 'How does the Business Fit Score work?',
+                a: 'Our AI analyzes competition level, search volume, keyword length, and platform-specific factors to calculate a score from 0-100. Higher scores mean better fit for YOUR specific business goals.'
+              },
+              {
+                q: 'Can I cancel my subscription anytime?',
+                a: 'Yes! You can cancel anytime from your account. You\'ll keep Pro access until the end of your billing period. Plus, we offer a 7-day money-back guarantee.'
+              },
+              {
+                q: 'What platforms do you support?',
+                a: 'We currently support Etsy, Amazon, YouTube, Blog/Content Marketing, and Google SEO. Each platform gets specifically tailored keyword strategies.'
+              },
+              {
+                q: 'How many keywords do I get?',
+                a: 'Free users get 30 keywords per search (1 search total). Pro users get 50 keywords per search with unlimited searches.'
+              },
+            ].map((faq, i) => (
+              <div key={i} className="bg-white rounded-xl p-6 shadow-md border border-gray-100">
+                <h4 className="font-bold text-gray-900 mb-2">{faq.q}</h4>
+                <p className="text-gray-600">{faq.a}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Final CTA */}
+        <div className="mt-16 sm:mt-24 text-center bg-gradient-to-r from-indigo-600 to-purple-600 rounded-2xl sm:rounded-3xl p-8 sm:p-12 md:p-16 shadow-2xl">
+          <h3 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-4">
+            Ready to Find Your Perfect Keywords?
+          </h3>
+          <p className="text-indigo-100 text-lg mb-8 max-w-2xl mx-auto">
+            Join thousands of marketers using AI-powered keyword research to grow their business.
+          </p>
+          <Link href="/onboarding">
+            <button className="bg-white text-indigo-600 px-8 sm:px-12 py-4 sm:py-5 rounded-xl text-lg font-bold hover:bg-gray-50 transition shadow-xl hover:shadow-2xl transform hover:scale-105">
+              🚀 Start Your Free Trial Now
+            </button>
+          </Link>
+          <p className="text-indigo-200 text-sm mt-4">No credit card required • Takes 30 seconds</p>
         </div>
       </main>
 
-      {/* Footer */}
-      <footer className="bg-white mt-16 sm:mt-24 md:mt-32 py-8 sm:py-12 border-t border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 text-center">
-          <p className="text-gray-500 text-xs sm:text-sm">
-            © 2026 KeywordGenerators.com • All rights reserved
-          </p>
+      {/* Professional Footer */}
+      <footer className="bg-gray-900 text-gray-400 mt-16 sm:mt-24 md:mt-32">
+        <div className="max-w-7xl mx-auto px-4 py-12 sm:py-16">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 sm:gap-12">
+            {/* Brand */}
+            <div className="col-span-2 md:col-span-1">
+              <img 
+                src="/logo.svg" 
+                alt="KeywordGenerators" 
+                className="h-10 sm:h-12 mb-4 brightness-0 invert opacity-90" 
+              />
+              <p className="text-sm leading-relaxed">
+                AI-powered keyword research for smarter SEO strategies. Find keywords that fit YOUR business.
+              </p>
+            </div>
+
+            {/* Product */}
+            <div>
+              <h4 className="text-white font-semibold mb-4 text-sm uppercase tracking-wider">Product</h4>
+              <ul className="space-y-3 text-sm">
+                <li>
+                  <Link href="/generate" className="hover:text-white transition">
+                    Generate Keywords
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/pricing" className="hover:text-white transition">
+                    Pricing
+                  </Link>
+                </li>
+              </ul>
+            </div>
+
+            {/* Legal */}
+            <div>
+              <h4 className="text-white font-semibold mb-4 text-sm uppercase tracking-wider">Legal</h4>
+              <ul className="space-y-3 text-sm">
+                <li>
+                  <Link href="/terms" className="hover:text-white transition">
+                    Terms of Service
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/privacy" className="hover:text-white transition">
+                    Privacy Policy
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/refund" className="hover:text-white transition">
+                    Refund Policy
+                  </Link>
+                </li>
+              </ul>
+            </div>
+
+            {/* Support */}
+            <div>
+              <h4 className="text-white font-semibold mb-4 text-sm uppercase tracking-wider">Support</h4>
+              <ul className="space-y-3 text-sm">
+                <li>
+                  <a href="mailto:support@keywordgenerators.com" className="hover:text-white transition">
+                    Contact Us
+                  </a>
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          {/* Bottom bar */}
+          <div className="border-t border-gray-800 mt-10 sm:mt-12 pt-8 flex flex-col sm:flex-row justify-between items-center gap-4 text-sm">
+            <p>© 2026 KeywordGenerators.com. All rights reserved.</p>
+            <p className="flex items-center gap-1">
+              Made with <span className="text-red-500">❤️</span> for SEO enthusiasts
+            </p>
+          </div>
         </div>
       </footer>
     </div>
