@@ -60,6 +60,32 @@ const bestForLabels = {
   'marketplace': '🏷️ Marketplace'
 };
 
+// Retry function
+async function retryWithBackoff<T>(
+  fn: () => Promise<T>,
+  maxRetries: number = 3,
+  baseDelay: number = 1000
+): Promise<T> {
+  let lastError: Error | null = null;
+  
+  for (let i = 0; i < maxRetries; i++) {
+    try {
+      return await fn();
+    } catch (error: any) {
+      lastError = error;
+      console.log(`⚠️ Attempt ${i + 1} failed: ${error.message}`);
+      
+      if (i < maxRetries - 1) {
+        const delay = baseDelay * Math.pow(2, i);
+        console.log(`⏳ Retrying in ${delay}ms...`);
+        await new Promise(resolve => setTimeout(resolve, delay));
+      }
+    }
+  }
+  
+  throw lastError;
+}
+
 export async function POST(req: NextRequest) {
   try {
     const user = await currentUser();
@@ -87,7 +113,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Complete onboarding first' }, { status: 400 });
     }
 
-    if (user) {
+    if (user && !usage.isAdmin) {
       await incrementUsage();
     }
 
@@ -98,46 +124,32 @@ export async function POST(req: NextRequest) {
     const mediumCount = Math.round(keywordCount * config.distribution.medium / 100);
     const longCount = keywordCount - shortCount - mediumCount;
 
-    // ✅ IMPROVED PROMPT - Emphasize exact count
-    const prompt = `YOU MUST GENERATE EXACTLY ${keywordCount} KEYWORDS. NOT ${keywordCount-1}, NOT ${keywordCount+1}. EXACTLY ${keywordCount}.
-
-Topic: "${topic}"
+    const prompt = `Generate EXACTLY ${keywordCount} keywords for: "${topic}"
 Platform: ${platform}
 
-DISTRIBUTION (MUST BE EXACT):
-- EXACTLY ${shortCount} SHORT keywords (1-2 words)
-- EXACTLY ${mediumCount} MEDIUM keywords (3-4 words)  
-- EXACTLY ${longCount} LONG keywords (5+ words)
+Distribution:
+- ${shortCount} SHORT (1-2 words)
+- ${mediumCount} MEDIUM (3-4 words)  
+- ${longCount} LONG (5+ words)
 
-RULES:
-1. NO numbers at end (❌ "dubai travel 1")
-2. Natural, realistic keywords only
-3. Platform focus: ${config.focus}
+Rules:
+1. NO numbers at end of keywords
+2. Natural, realistic keywords
+3. Focus: ${config.focus}
 4. Examples: ${config.examples}
 
-Return EXACTLY ${keywordCount} keywords in this JSON format:
-[
-  {
-    "keyword": "natural keyword",
-    "length": "short",
-    "searchVolume": "12K",
-    "competition": "low",
-    "businessFitScore": 85,
-    "keywordType": "${config.bestFor}",
-    "explanation": "Why it works"
-  }
-]
+Return ONLY a valid JSON array with this exact format (no markdown, no extra text):
+[{"keyword":"example keyword","length":"short","searchVolume":"12K","competition":"low","businessFitScore":85,"explanation":"Why it works"}]`;
 
-CRITICAL: Array must have EXACTLY ${keywordCount} items. Count them before responding!`;
-
-    let aiResponse = '';
-    
-    try {
+    // Call AI with retry
+    const keywords = await retryWithBackoff(async () => {
+      console.log('🤖 Calling Groq API...');
+      
       const completion = await groq.chat.completions.create({
         messages: [
           {
             role: 'system',
-            content: `You are a keyword researcher. You MUST generate EXACTLY the requested number of keywords. Count them before responding. Return ONLY valid JSON.`,
+            content: 'You are a keyword research expert. Return ONLY valid JSON arrays. No markdown, no code blocks, no explanations - just the JSON array.',
           },
           {
             role: 'user',
@@ -145,65 +157,50 @@ CRITICAL: Array must have EXACTLY ${keywordCount} items. Count them before respo
           },
         ],
         model: 'llama-3.3-70b-versatile',
-        temperature: 0.5,
+        temperature: 0.3,
         max_tokens: 4000,
       });
 
-      aiResponse = completion.choices[0]?.message?.content || '';
+      const aiResponse = completion.choices[0]?.message?.content || '';
+      console.log('📝 AI Response length:', aiResponse.length);
+      console.log('📝 AI Response preview:', aiResponse.substring(0, 200));
 
-    } catch (error: any) {
-      console.error('❌ Groq error:', error.message);
-      throw new Error('AI service error');
-    }
+      // Clean response
+      let cleaned = aiResponse
+        .trim()
+        .replace(/```json\n?/g, '')
+        .replace(/```\n?/g, '')
+        .replace(/^\s*[\r\n]/gm, '')
+        .trim();
 
-    // Clean and parse
-    let cleaned = aiResponse
-      .trim()
-      .replace(/```json\n?/g, '')
-      .replace(/```\n?/g, '')
-      .trim();
-
-    const arrayMatch = cleaned.match(/\[[\s\S]*\]/);
-    if (!arrayMatch) {
-      throw new Error('AI did not return valid JSON');
-    }
-    
-    cleaned = arrayMatch[0];
-
-    let keywords;
-    try {
-      keywords = JSON.parse(cleaned);
-    } catch (parseError) {
-      throw new Error('Invalid JSON from AI');
-    }
-
-    if (!Array.isArray(keywords) || keywords.length === 0) {
-      throw new Error('No keywords generated');
-    }
-
-    // ✅ ENSURE EXACT COUNT - Pad if needed
-    if (keywords.length < keywordCount) {
-      console.log(`⚠️ AI returned ${keywords.length}, padding to ${keywordCount}`);
+      // Find JSON array
+      const startIndex = cleaned.indexOf('[');
+      const endIndex = cleaned.lastIndexOf(']');
       
-      // Duplicate and vary last keywords to reach target
-      const needed = keywordCount - keywords.length;
-      const lastKeywords = keywords.slice(-Math.min(5, keywords.length));
-      
-      for (let i = 0; i < needed; i++) {
-        const base = lastKeywords[i % lastKeywords.length];
-        keywords.push({
-          ...base,
-          keyword: `${base.keyword} guide`,
-          explanation: `Alternative: ${base.explanation}`
-        });
+      if (startIndex === -1 || endIndex === -1) {
+        throw new Error('No JSON array found in response');
       }
-    }
+      
+      cleaned = cleaned.substring(startIndex, endIndex + 1);
 
-    // Trim to exact count
-    keywords = keywords.slice(0, keywordCount);
+      // Parse JSON
+      let parsed;
+      try {
+        parsed = JSON.parse(cleaned);
+      } catch (e) {
+        console.log('❌ JSON parse error. Cleaned string:', cleaned.substring(0, 500));
+        throw new Error('Invalid JSON from AI');
+      }
 
-    // Calculate scores
-    keywords = keywords.map((kw: any) => {
+      if (!Array.isArray(parsed) || parsed.length === 0) {
+        throw new Error('Empty or invalid array');
+      }
+
+      return parsed;
+    }, 3, 1000);
+
+    // Process keywords
+    let processedKeywords = keywords.slice(0, keywordCount).map((kw: any) => {
       const volumeNum = parseVolume(kw.searchVolume || '1K');
       const compScore = kw.competition === 'low' ? 30 : kw.competition === 'medium' ? 20 : 10;
       const lengthScore = kw.length === 'long' ? 25 : kw.length === 'medium' ? 20 : 15;
@@ -224,23 +221,35 @@ CRITICAL: Array must have EXACTLY ${keywordCount} items. Count them before respo
       };
     });
 
-    keywords.sort((a: any, b: any) => b.businessFitScore - a.businessFitScore);
+    // Pad if needed
+    while (processedKeywords.length < keywordCount && processedKeywords.length > 0) {
+      const base = processedKeywords[processedKeywords.length % processedKeywords.length];
+      processedKeywords.push({
+        ...base,
+        keyword: `${base.keyword} tips`,
+        explanation: `Related: ${base.explanation}`
+      });
+    }
 
-    console.log(`✅ Returning EXACTLY ${keywords.length} keywords (target: ${keywordCount})`);
+    processedKeywords = processedKeywords.slice(0, keywordCount);
+    processedKeywords.sort((a: any, b: any) => b.businessFitScore - a.businessFitScore);
+
+    console.log(`✅ Returning ${processedKeywords.length} keywords`);
 
     return NextResponse.json({
-      keywords,
-      count: keywords.length,
+      keywords: processedKeywords,
+      count: processedKeywords.length,
       remaining: usage.remaining,
       isPro: usage.isPro,
+      isAdmin: usage.isAdmin,
       userProfile: { platform, goal, strategy },
     });
 
   } catch (error: any) {
-    console.error('💥 Error:', error.message);
+    console.error('💥 Final Error:', error.message);
 
     return NextResponse.json(
-      { error: error.message || 'Failed to generate keywords' },
+      { error: 'Failed to generate keywords. Please try again.' },
       { status: 500 }
     );
   }

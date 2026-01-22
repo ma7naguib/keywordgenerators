@@ -8,6 +8,7 @@ import {
   SignedIn,
   SignedOut,
   UserButton,
+  useUser,
 } from '@clerk/nextjs';
 
 interface KeywordResult {
@@ -22,12 +23,14 @@ interface KeywordResult {
 
 function GeneratePageContent() {
   const searchParams = useSearchParams();
+  const { isSignedIn, user } = useUser();
   const [topic, setTopic] = useState('');
   const [keywords, setKeywords] = useState<KeywordResult[]>([]);
   const [filteredKeywords, setFilteredKeywords] = useState<KeywordResult[]>([]);
   const [userProfile, setUserProfile] = useState<any>(null);
   const [remaining, setRemaining] = useState<number | null>(null);
   const [isPro, setIsPro] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [needsOnboarding, setNeedsOnboarding] = useState(false);
@@ -89,8 +92,8 @@ function GeneratePageContent() {
       return;
     }
 
-    // Check localStorage for anonymous users
-    if (typeof window !== 'undefined') {
+    // ✅ ONLY check localStorage for ANONYMOUS users (not signed in)
+    if (!isSignedIn && typeof window !== 'undefined') {
       const hasUsedFreeTrial = localStorage.getItem('freeTrialUsed');
       if (hasUsedFreeTrial === 'true') {
         setError('Free trial used! Sign up to continue or upgrade to Pro for unlimited searches.');
@@ -119,9 +122,10 @@ function GeneratePageContent() {
       setUserProfile(data.userProfile);
       setRemaining(data.remaining);
       setIsPro(data.isPro);
+      setIsAdmin(data.isAdmin || false);
 
-      // Mark free trial as used for anonymous users
-      if (typeof window !== 'undefined' && !data.isPro) {
+      // ✅ ONLY mark free trial for ANONYMOUS users
+      if (!isSignedIn && typeof window !== 'undefined' && !data.isPro) {
         localStorage.setItem('freeTrialUsed', 'true');
       }
     } catch (err: any) {
@@ -235,6 +239,15 @@ function GeneratePageContent() {
         )}
 
         <div className="bg-white rounded-2xl shadow-lg p-8">
+          {/* ✅ Admin Badge */}
+          {isAdmin && (
+            <div className="mb-4 p-3 bg-purple-100 border border-purple-300 rounded-lg">
+              <p className="text-sm text-purple-800 font-semibold">
+                👑 Admin Mode - Unlimited Access
+              </p>
+            </div>
+          )}
+
           {userProfile && (
             <div className="mb-6 p-4 bg-indigo-50 rounded-lg">
               <p className="text-sm text-indigo-800">
@@ -252,7 +265,7 @@ function GeneratePageContent() {
           </p>
 
           <div className="space-y-4">
-            {/* ✅ FREE TRIAL WARNING BANNER */}
+            {/* ✅ FREE TRIAL WARNING BANNER - Only for anonymous users */}
             <SignedOut>
               {!keywords.length && !error && (
                 <div className="bg-gradient-to-r from-green-50 to-blue-50 border-2 border-green-200 rounded-xl p-4">
@@ -483,38 +496,42 @@ function GeneratePageContent() {
                 </div>
               )}
 
-              {/* Upgrade Prompts */}
-              <SignedIn>
-                <div className="mt-6 bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-                  <p className="text-sm text-yellow-800">
-                    💡 {isPro ? (
-                      <strong>Pro Plan: Unlimited personalized keyword runs!</strong>
-                    ) : (
-                      <>
-                        <strong>Free tier:</strong> You've used your free run.
-                        <Link href="/pricing">
-                          <span className="text-indigo-600 hover:underline ml-1 cursor-pointer font-semibold">
-                            Upgrade to Pro
-                          </span>
-                        </Link> for unlimited keywords!
-                      </>
-                    )}
-                  </p>
-                </div>
-              </SignedIn>
+              {/* Upgrade Prompts - Not for Admin */}
+              {!isAdmin && (
+                <>
+                  <SignedIn>
+                    <div className="mt-6 bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                      <p className="text-sm text-yellow-800">
+                        💡 {isPro ? (
+                          <strong>Pro Plan: Unlimited personalized keyword runs!</strong>
+                        ) : (
+                          <>
+                            <strong>Free tier:</strong> You've used your free run.
+                            <Link href="/pricing">
+                              <span className="text-indigo-600 hover:underline ml-1 cursor-pointer font-semibold">
+                                Upgrade to Pro
+                              </span>
+                            </Link> for unlimited keywords!
+                          </>
+                        )}
+                      </p>
+                    </div>
+                  </SignedIn>
 
-              <SignedOut>
-                <div className="mt-6 bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-                  <p className="text-sm text-yellow-800">
-                    💡 <strong>Sign up for free</strong> to get more personalized keywords!
-                    <SignInButton mode="modal">
-                      <span className="text-indigo-600 hover:underline ml-1 cursor-pointer font-semibold">
-                        Sign Up Now (Free)
-                      </span>
-                    </SignInButton>
-                  </p>
-                </div>
-              </SignedOut>
+                  <SignedOut>
+                    <div className="mt-6 bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                      <p className="text-sm text-yellow-800">
+                        💡 <strong>Sign up for free</strong> to get more personalized keywords!
+                        <SignInButton mode="modal">
+                          <span className="text-indigo-600 hover:underline ml-1 cursor-pointer font-semibold">
+                            Sign Up Now (Free)
+                          </span>
+                        </SignInButton>
+                      </p>
+                    </div>
+                  </SignedOut>
+                </>
+              )}
             </div>
           )}
 
