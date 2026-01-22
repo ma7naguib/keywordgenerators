@@ -31,10 +31,10 @@ export const metadata: Metadata = {
     siteName: 'KeywordGenerators',
     images: [
       {
-        url: '/logo.svg',
-        width: 2400,
-        height: 600,
-        alt: 'KeywordGenerators Logo - AI-Powered Keyword Research',
+        url: '/og-image.png',
+        width: 1200,
+        height: 630,
+        alt: 'KeywordGenerators - AI-Powered Keyword Research',
       },
     ],
   },
@@ -42,7 +42,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'KeywordGenerators - AI-Powered Keyword Research',
     description: 'Get personalized keywords with Business Fit Scores',
-    images: ['/logo.svg'],
+    images: ['/og-image.png'],
     creator: '@keywordgen',
   },
   robots: {
