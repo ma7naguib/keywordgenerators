@@ -8,10 +8,19 @@ const ADMIN_EMAILS = ['ma7.naguib@gmail.com'];
 export async function checkUsageLimit() {
   const user = await currentUser();
   
+  // DEBUG: Log user emails
+  console.log('=== ADMIN DEBUG ===');
+  console.log('User ID:', user?.id);
+  console.log('User emails:', user?.emailAddresses?.map(e => e.emailAddress));
+  console.log('ADMIN_EMAILS:', ADMIN_EMAILS);
+  
   // Check if Admin
-  const isAdmin = user?.emailAddresses?.some(
-    email => ADMIN_EMAILS.includes(email.emailAddress.toLowerCase())
-  );
+  const userEmail = user?.emailAddresses?.[0]?.emailAddress?.toLowerCase();
+  const isAdmin = userEmail ? ADMIN_EMAILS.includes(userEmail) : false;
+  
+  console.log('User primary email:', userEmail);
+  console.log('Is Admin:', isAdmin);
+  console.log('===================');
   
   if (isAdmin) {
     return { allowed: true, remaining: -1, isPro: true, isAdmin: true }; // Unlimited
@@ -43,9 +52,8 @@ export async function incrementUsage() {
   const user = await currentUser();
   
   // Check if Admin
-  const isAdmin = user?.emailAddresses?.some(
-    email => ADMIN_EMAILS.includes(email.emailAddress.toLowerCase())
-  );
+  const userEmail = user?.emailAddresses?.[0]?.emailAddress?.toLowerCase();
+  const isAdmin = userEmail ? ADMIN_EMAILS.includes(userEmail) : false;
   
   if (isAdmin) return; // Admins don't need tracking
   
