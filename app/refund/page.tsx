@@ -37,9 +37,9 @@ export default function RefundPage() {
             <div className="flex items-start gap-4">
               <div className="text-3xl">💯</div>
               <div>
-                <h3 className="font-bold text-gray-900 text-lg mb-2">7-Day Money-Back Guarantee</h3>
+                <h3 className="font-bold text-gray-900 text-lg mb-2">14-Day Money-Back Guarantee</h3>
                 <p className="text-gray-700">
-                  We're confident you'll love KeywordGenerators. If you're not satisfied within the first 7 days 
+                  We're confident you'll love KeywordGenerators. If you're not satisfied within the first 14 days 
                   of your Pro subscription, we'll give you a full refund — no questions asked.
                 </p>
               </div>
@@ -51,7 +51,7 @@ export default function RefundPage() {
               <h2 className="text-xl font-bold text-gray-900 mt-8 mb-4">1. Eligibility for Refund</h2>
               <p>You are eligible for a full refund if:</p>
               <ul className="list-disc pl-6 mt-2 space-y-1">
-                <li>You request a refund within 7 days of your first Pro subscription payment</li>
+                <li>You request a refund within 14 days of your first Pro subscription payment</li>
                 <li>You haven't previously received a refund for KeywordGenerators</li>
               </ul>
             </section>
@@ -70,15 +70,15 @@ export default function RefundPage() {
                 <li>Briefly mention why you're requesting a refund (optional, but helps us improve)</li>
               </ol>
               <p className="mt-4">
-                We'll process your refund within 3-5 business days. The refund will be credited to your 
+                We'll process your refund within 5-10 business days. The refund will be credited to your 
                 original payment method.
               </p>
             </section>
 
             <section>
-              <h2 className="text-xl font-bold text-gray-900 mt-8 mb-4">3. After 7 Days</h2>
+              <h2 className="text-xl font-bold text-gray-900 mt-8 mb-4">3. After 14 Days</h2>
               <p>
-                After the 7-day period, we do not offer refunds. However, you can cancel your subscription 
+                After the 14-day period, we do not offer refunds. However, you can cancel your subscription 
                 at any time to prevent future charges. Your Pro access will continue until the end of your 
                 current billing period.
               </p>
@@ -90,7 +90,7 @@ export default function RefundPage() {
               <ol className="list-decimal pl-6 mt-2 space-y-2">
                 <li>Sign in to your KeywordGenerators account</li>
                 <li>Go to Pricing page or click "Manage Subscription"</li>
-                <li>Click "Cancel Subscription" in the Stripe billing portal</li>
+                <li>Click "Cancel Subscription" in the billing portal</li>
               </ol>
               <p className="mt-4">
                 Once cancelled, you'll retain Pro access until the end of your billing cycle. After that, 
@@ -114,7 +114,7 @@ export default function RefundPage() {
                 If you're experiencing technical issues with the service, please contact us first. We're 
                 committed to resolving any problems and ensuring you get value from KeywordGenerators. 
                 In cases of persistent technical issues that we cannot resolve, we may offer refunds or 
-                credits at our discretion.
+                credits at our discretion, even outside the 14-day window.
               </p>
             </section>
 
