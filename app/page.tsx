@@ -303,7 +303,7 @@ export default function Home() {
           <div className="text-center mt-8">
             <p className="text-gray-600 flex items-center justify-center gap-2">
               <span className="text-xl">🛡️</span>
-              7-day money-back guarantee • No questions asked
+              14-day money-back guarantee • No questions asked
             </p>
           </div>
         </div>
